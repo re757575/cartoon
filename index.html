@@ -17,11 +17,15 @@
 	$(function(){
 		//one();
 		$("#one").click(function(){
+			$(this).arrt("class","active");
+			$("#two").arrt("class","");
 			$("div").html("");
 			$("img").show();
 			one();
 		});
 		$("#two").click(function(){
+			$(this).arrt("class","active");
+			$("#one").arrt("class","");
 			$("div").html("");
 			$("img").show();
 			two();
