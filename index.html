@@ -1,0 +1,119 @@
+<html>
+<head>
+ <script type='text/javascript' src='http://code.jquery.com/jquery-2.0.2.js'></script>
+  <link href="stylesheets/bootstrap.css" rel="stylesheet">
+  <style>
+	a:link, a:visited {
+		
+		text-decoration: none;
+	}
+	a:hover {
+		color:#998F8D;
+	}
+
+  </style>
+
+ <script type='text/javascript'>
+	$(function(){
+		//one();
+		$("#one").click(function(){
+			$("div").html("");
+			$("img").show();
+			one();
+		});
+		$("#two").click(function(){
+			$("div").html("");
+			$("img").show();
+			two();
+		});		
+	});
+	
+	function one(){
+		 $.getJSON("http://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20html%20%0Awhere%20url%3D%22http%3A%2F%2Fqingkong.net%2Fanime%2Frenew%2F%22%0Aand%20xpath%3D'%2F%2F*%5B%40class%3D%22summary%22%5D'&format=json&diagnostics=true&callback=?",Myjsonp);
+		 
+		 function Myjsonp(data){
+			  console.log("/**************開始擷取青空動漫****************/\n\n");
+			  		
+				var ary = data.query.results.div;
+				var out = "<ul>";
+				for(index in ary){
+					var href = ary[index].div.div.a.href;
+					var title = ary[index].div.div.a.title;
+					var season ;
+					var release ;
+					switch(ary[index].div.div.span.length){
+						case 3:
+							 season = ary[index].div.div.span[1].content;
+							 release = ary[index].div.div.span[2].content;
+							 break;
+						case 2:
+							 season = ary[index].div.div.span[0].content;
+							 release = ary[index].div.div.span[1].content;
+							 break;
+						case undefined:
+							 season = "未知";
+							 release = ary[index].div.div.span.content;	
+							 break;							 
+						default:
+							 season = "未知";
+							 release = "未知";
+							 break;						
+					}
+					out += "<li><a href="+href+" target=\"_blank\" ><h2>"+title+"</h2></a><span class=\"text-success\">"+season+"</span>    <span class=\"text-success\">"+release+"</span><hr/></li>";
+					
+					console.log("["+index+"]title:"+title);
+					console.log("href:"+href);		
+					console.log("season:"+season);
+					console.log("release:"+release);
+					
+					console.log(ary[index].div.div.span.length);
+					console.log("/*******************************************************/\n");
+					//console.log(ary[index].div.div.a);
+					//console.log(ary[index].div.div.span);
+					
+				}
+				out+= "</ul>"
+				$("img").hide();
+				$("div").html(out);
+		   }		
+		}	
+		
+		function two(){
+			$.getJSON("http://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20html%20%0Awhere%20url%3D%22http%3A%2F%2Fwww.dm456.com%2F%22%0Aand%20xpath%3D'%2F%2F*%5B%40class%3D%22hotUpdateList%22%5D'&format=json&diagnostics=true&callback=?",Myjsonp);
+			
+			 function Myjsonp(data){
+			 
+				console.log("/**************開始擷取dm456****************/\n\n");
+				var ary = data.query.results.div.ul.li;
+				var out = "<ul>";
+				console.log(ary);
+				for(index in ary){
+					var href = "http://www.dm456.com/" +ary[index].p.span.a.href;
+					var count = ary[index].p.span.a.content;
+					var title = ary[index].a.title +" "+count;
+					
+					console.log("["+index+"]title:"+title);
+					console.log("href:"+href);	
+					
+					out += "<li><a href="+href+" target=\"_blank\" ><h2>"+title+"</h2></a><hr/></li>";
+				}
+				out+= "</ul>"
+				$("img").hide();
+				$("div").html(out);
+			 }
+		}
+</script>
+
+</head>
+
+<body>
+	<ul class="nav nav-pills">
+		<li class="active" ><a href="#" id="one" >青空動漫</a></li>
+		<li><a href="#" id="two">動漫456</a></li>
+    </ul>
+	<hr/>
+
+<img src="images/ajax-loader.gif " style="display: none;"/>
+<div></div>
+</body>
+<html>
