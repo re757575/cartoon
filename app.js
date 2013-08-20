@@ -20,6 +20,14 @@ app.use(express.methodOverride());
 app.use(app.router);
 app.use(express.static(path.join(__dirname, 'public')));
 
+app.use(function(req, res) {
+     res.sendfile(__dirname + '/404.html',404);
+});
+  
+app.use(function(error, req, res, next) {
+     res.send('500: Internal Server Error', 500);
+});
+  
 // development only
 if ('development' == app.get('env')) {
   app.use(express.errorHandler());
