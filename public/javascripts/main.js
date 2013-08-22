@@ -1,4 +1,4 @@
-$(function(){
+$(function(){      
 		one();
 		$("#one").click(function(){
 			$(this).parent().addClass("active");
@@ -12,19 +12,35 @@ $(function(){
 		});	
 	});
 	
+  
+  
+  /*      
+    // 偵錯用    
+    $.ajax({
+      url: "http://127.0.0.1:3000/myjsonp",
+      type: "GET",
+      dataType: "json",
+      success: function(Jdata) {
+        alert("SUCCESS!!!");
+      },   
+    error : function(XMLHttpRequest, textStatus, errorThrown) { 
+            alert(XMLHttpRequest.status);      
+            alert(XMLHttpRequest.readyState);    
+            alert(textStatus);
+    }
+
+    }); 
+  */  
+  
 	function one(){
 		console.log("/**************開始擷取青空動漫****************/\n\n");
 		$("article").html("");
 		$(".loadimg").show();
-		 $.getJSON("http://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20html%20%0Awhere%20url%3D%22http%3A%2F%2Fqingkong.net%2Fanime%2Frenew%2F%22%0Aand%20xpath%3D'%2F%2F*%5B%40class%3D%22summary%22%5D'&format=json&diagnostics=true&callback=?",Myjsonp)
-		 .done(function() { console.log( "解析完畢...." ); })
-		 .fail(function() { console.log( "YQL讀取失敗" ); $(".loadimg").hide(); $("article").html("<h1 class=\"text-error\">讀取失敗! 請重試</h1>");});
-		 
-		 console.log("解析中....");
-		 
-		 function Myjsonp(data){
+    
+		$.getJSON("http://127.0.0.1:3000/myjsonp?num=1", function (data){
 				
-				var ary = data.query.results.div;
+				console.log(data);
+        var ary = data.query.results.div;
 				var out = "<ul>";
 				for(index in ary){
 					var href = ary[index].div.div.a.href;
@@ -53,50 +69,54 @@ $(function(){
 					
 					console.log("["+index+"]title:"+title);
 					console.log("href:"+href);		
-					console.log("season:"+season);
+					console.log("season:"+season);                                            
 					console.log("release:"+release);
 					
 					console.log(ary[index].div.div.span.length);
-					console.log("/*******************************************************/\n");
-					//console.log(ary[index].div.div.a);
-					//console.log(ary[index].div.div.span);
+					console.log('/*******************************************************');     
+					console.log(ary[index].div.div.a);
+					console.log(ary[index].div.div.span);
 					
 				}
-				out+= "</ul>"
+				out+= "</ul>"                           
 				$(".loadimg").hide();
 				$("article").html(out);
 				
-		   }		
+		   }	)
+		 .done(function() { console.log( "解析完畢...." ); })
+		 .fail(function() { console.log( "YQL讀取失敗" ); $(".loadimg").hide(); $("article").html("<h1 class=\"text-error\">讀取失敗! 請重試</h1>");});
+		    
+		 console.log("解析中....");
 		}	
+
 		
 		function two(){
 			console.log("/**************開始擷取dm456****************/\n\n");
 			$("article").html("");
 			$(".loadimg").show();
-			$.getJSON("http://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20html%20%0Awhere%20url%3D%22http%3A%2F%2Fwww.dm456.com%2F%22%0Aand%20xpath%3D'%2F%2F*%5B%40class%3D%22hotUpdateList%22%5D'&format=json&diagnostics=true&callback=?",Myjsonp)
+			$.getJSON("http://127.0.0.1:3000/myjsonp?num=2", function (data){
+				
+  				var ary = data.query.results.div.ul.li;
+  				var out = "<ul>";
+  				console.log(ary);
+  				for(index in ary){
+  					var href = "http://www.dm456.com/" +ary[index].p.span.a.href;
+  					var count = ary[index].p.span.a.content;
+  					var title = ary[index].a.title +" "+count;
+  					
+  					console.log("["+index+"]title:"+title);
+  					console.log("href:"+href);	
+  					
+  					out += "<li><a href="+href+" target=\"_blank\" ><div><h2>"+title+"</h2></div></a><hr/></li>";
+  				}
+  				out+= "</ul>"
+  				$(".loadimg").hide();
+  				$("article").html(out);
+			
+			 })
 			.done(function() { console.log( "解析完畢...." ); })
 			.fail(function() { console.log( "YQL讀取失敗" ); $(".loadimg").hide(); $("article").html("<h1 class=\"text-error\">讀取失敗! 請重試</h1>");});
-			
 			console.log("解析中....");
 			
-			 function Myjsonp(data){
-				
-				var ary = data.query.results.div.ul.li;
-				var out = "<ul>";
-				console.log(ary);
-				for(index in ary){
-					var href = "http://www.dm456.com/" +ary[index].p.span.a.href;
-					var count = ary[index].p.span.a.content;
-					var title = ary[index].a.title +" "+count;
-					
-					console.log("["+index+"]title:"+title);
-					console.log("href:"+href);	
-					
-					out += "<li><a href="+href+" target=\"_blank\" ><div><h2>"+title+"</h2></div></a><hr/></li>";
-				}
-				out+= "</ul>"
-				$(".loadimg").hide();
-				$("article").html(out);
-			
-			 }
+
 		}
