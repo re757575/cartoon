@@ -42,7 +42,7 @@ app.get('/', function (req, res) {
 
 app.get('/myjsonp', function (req, res) {
 
-  var url ;
+  var url ="";
   
   if(req.query.num == "1"){
      console.log("num=1,青空");
