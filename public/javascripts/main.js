@@ -37,7 +37,7 @@ $(function(){
 		$("article").html("");
 		$(".loadimg").show();
     
-		$.getJSON("http://127.0.0.1:3000/myjsonp?num=1", function (data){
+		$.getJSON("myjsonp?num=1", function (data){
 				
 				console.log(data);
         var ary = data.query.results.div;
@@ -94,7 +94,7 @@ $(function(){
 			console.log("/**************開始擷取dm456****************/\n\n");
 			$("article").html("");
 			$(".loadimg").show();
-			$.getJSON("http://127.0.0.1:3000/myjsonp?num=2", function (data){
+			$.getJSON("myjsonp?num=2", function (data){
 				
   				var ary = data.query.results.div.ul.li;
   				var out = "<ul>";
