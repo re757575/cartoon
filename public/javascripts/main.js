@@ -1,16 +1,16 @@
 $(function(){      
-		one();
+		one_server_side();
 		$("#one").click(function(){
 			$(this).parent().addClass("active");
 			$("#two").parent().removeClass("active");
-			one();
+			one_server_side();
 		});
 		$("#two").click(function(){
 			$(this).parent().addClass("active");
 			$("#one").parent().removeClass("active");
-			two();
+			two_server_side();
 		});	
-	});
+});
 	
   
   
@@ -32,91 +32,171 @@ $(function(){
     }); 
   */  
   
-	function one(){
-		console.log("/**************開始擷取青空動漫****************/\n\n");
+ var one_errorloadConut = 0; 
+ var two_errorloadConut = 0; 
+  
+    //抓伺服器讀取的jsonp
+	function one_server_side(){
+		console.log("/**************server side 開始擷取青空動漫****************/\n\n");
 		$("article").html("");
 		$(".loadimg").show();
     
-		$.getJSON("myjsonp?num=1", function (data){
-				
-				console.log(data);
-        var ary = data.query.results.div;
-				var out = "<ul>";
-				for(index in ary){
-					var href = ary[index].div.div.a.href;
-					var title = ary[index].div.div.a.title;
-					var season ;
-					var release ;
-					switch(ary[index].div.div.span.length){
-						case 3:
-							 season = ary[index].div.div.span[1].content;
-							 release = ary[index].div.div.span[2].content;
-							 break;
-						case 2:
-							 season = ary[index].div.div.span[0].content;
-							 release = ary[index].div.div.span[1].content;
-							 break;
-						case undefined:
-							 season = "未知";
-							 release = ary[index].div.div.span.content;	
-							 break;							 
-						default:
-							 season = "未知";
-							 release = "未知";
-							 break;						
-					}
-					out += "<li><a href="+href+" target=\"_blank\" ><div><h2>"+title+"</h2><span class=\"text-error\">"+season+"</span>    <span class=\"text-success\">"+release+"</span></div></a><hr/></li>";
-					
-					console.log("["+index+"]title:"+title);
-					console.log("href:"+href);		
-					console.log("season:"+season);                                            
-					console.log("release:"+release);
-					
-					console.log(ary[index].div.div.span.length);
-					console.log('/*******************************************************');     
-					console.log(ary[index].div.div.a);
-					console.log(ary[index].div.div.span);
-					
-				}
-				out+= "</ul>"                           
-				$(".loadimg").hide();
-				$("article").html(out);
-				
-		   }	)
+		$.getJSON("myjsonp?num=1",cartoon_1)
 		 .done(function() { console.log( "解析完畢...." ); })
-		 .fail(function() { console.log( "YQL讀取失敗" ); $(".loadimg").hide(); $("article").html("<h1 class=\"text-error\">讀取失敗! 請重試</h1>");});
-		    
+		 .fail(function() {
+			one_errorloadConut++;
+			console.log( "server 讀取jsonp失敗,轉換client side 抓jsonp" ); 
+			console.log("one_errorloadConut="+one_errorloadConut);
+			if(one_errorloadConut >= 2){
+				$("article").html("<h1 class=\"text-error\">讀取失敗! 請檢查網路連線</h1>");
+				console.log("server client side 皆失敗");
+				$(".loadimg").hide(); 
+			}else{
+				$(".loadimg").hide(); 
+				one_client_side();
+			}
+		 });    
 		 console.log("解析中....");
-		}	
+	}	
 
-		
-		function two(){
-			console.log("/**************開始擷取dm456****************/\n\n");
+
+	function two_server_side(){
+			console.log("/**************server side 開始擷取dm456****************/\n\n");
 			$("article").html("");
 			$(".loadimg").show();
-			$.getJSON("myjsonp?num=2", function (data){
-				
-  				var ary = data.query.results.div.ul.li;
-  				var out = "<ul>";
-  				console.log(ary);
-  				for(index in ary){
-  					var href = "http://www.dm456.com/" +ary[index].p.span.a.href;
-  					var count = ary[index].p.span.a.content;
-  					var title = ary[index].a.title +" "+count;
-  					
-  					console.log("["+index+"]title:"+title);
-  					console.log("href:"+href);	
-  					
-  					out += "<li><a href="+href+" target=\"_blank\" ><div><h2>"+title+"</h2></div></a><hr/></li>";
-  				}
-  				out+= "</ul>"
-  				$(".loadimg").hide();
-  				$("article").html(out);
-			
-			 })
+			$.getJSON("myjsonp?num=2",cartoon_2)
 			.done(function() { console.log( "解析完畢...." ); })
-			.fail(function() { console.log( "YQL讀取失敗" ); $(".loadimg").hide(); $("article").html("<h1 class=\"text-error\">讀取失敗! 請重試</h1>");});
+			.fail(function() {
+				two_errorloadConut++;
+				console.log( "server 讀取jsonp失敗,轉換client side 抓jsonp" ); 
+				console.log("two_errorloadConut="+two_errorloadConut);
+				if(two_errorloadConut >= 2){
+					$("article").html("<h1 class=\"text-error\">讀取失敗! 請檢查網路連線</h1>");
+					console.log("server client side 皆失敗");
+					$(".loadimg").hide(); 
+				}else{
+					$(".loadimg").hide(); 
+					two_client_side();
+				}
+			 }); 
 			console.log("解析中....");
-			
+	}
 
+	//client side 直接抓jonp
+	function one_client_side(){
+		console.log("/**************client side開始擷取青空動漫****************/\n\n");
+		$("article").html("");
+		$(".loadimg").show();
+    
+		 $.getJSON("http://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20html%20%0Awhere%20url%3D%22http%3A%2F%2Fqingkong.net%2Fanime%2Frenew%2F%22%0Aand%20xpath%3D'%2F%2F*%5B%40class%3D%22summary%22%5D'&format=json&diagnostics=true&callback=?",cartoon_1)
+		 .done(function() { console.log( "解析完畢...." ); })
+		 .fail(function() {
+			one_errorloadConut++;
+			console.log("one_errorloadConut="+one_errorloadConut);
+			if(one_errorloadConut >= 2){
+				$("article").html("<h1 class=\"text-error\">讀取失敗! 請檢查網路連線</h1>");
+				console.log("server client side 皆失敗");
+				$(".loadimg").hide(); 
+			}else{
+				console.log( "client side 讀取jsonp失敗,轉換server side 抓jsonp" ); 
+				$(".loadimg").hide(); 
+				one_server_side();				
+			}
+		 });    
+		 console.log("解析中....");
+	}	
+	
+	function two_client_side(){
+		console.log("/**************client side開始擷取動漫456****************/\n\n");
+		$("article").html("");
+		$(".loadimg").show();
+    
+		 $.getJSON("http://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20html%20%0Awhere%20url%3D%22http%3A%2F%2Fwww.dm456.com%2F%22%0Aand%20xpath%3D'%2F%2F*%5B%40class%3D%22hotUpdateList%22%5D'&format=json&diagnostics=true&callback=?",cartoon_2)
+		 .done(function() { console.log( "解析完畢...." ); })
+		 .fail(function() {
+			one_errorloadConut++;
+			console.log("two_errorloadConut="+two_errorloadConut);
+			if(two_errorloadConut >= 2){
+				$("article").html("<h1 class=\"text-error\">讀取失敗! 請檢查網路連線</h1>");
+				console.log("server client side 皆失敗");
+				$(".loadimg").hide(); 
+			}else{
+				console.log( "client side 讀取jsonp失敗,轉換server side 抓jsonp" ); 
+				$(".loadimg").hide(); 
+				two_server_side();				
+			}
+		 }); 
+		 console.log("解析中....");
+	}	
+	
+		
+function cartoon_1 (data){
+				
+		console.log(data);
+        var ary = data.query.results.div;
+		var out = "<ul>";
+		for(index in ary){
+			var href = ary[index].div.div.a.href;
+			var title = ary[index].div.div.a.title;
+			var season ;
+			var release ;
+			switch(ary[index].div.div.span.length){
+			case 3:
+				season = ary[index].div.div.span[1].content;
+				release = ary[index].div.div.span[2].content;
+				break;
+			case 2:
+				eason = ary[index].div.div.span[0].content;
+				release = ary[index].div.div.span[1].content;
+				break;
+			case undefined:
+				season = "未知";
+				release = ary[index].div.div.span.content;	
+				break;							 
+			default:
+				season = "未知";
+				release = "未知";
+				break;						
+			}
+			out += "<li><a href="+href+" target=\"_blank\" ><div><h2>"+title+"</h2><span class=\"text-error\">"+season+"</span>    <span class=\"text-success\">"+release+"</span></div></a><hr/></li>";
+						
+		console.log("["+index+"]title:"+title);
+	console.log("href:"+href);		
+			console.log("season:"+season);                                            
+			console.log("release:"+release);
+						
+			console.log(ary[index].div.div.span.length);
+			console.log('/*******************************************************');     
+			console.log(ary[index].div.div.a);
+			console.log(ary[index].div.div.span);
+					
 		}
+		out+= "</ul>"                           
+		$(".loadimg").hide();
+		$("article").html(out);
+				
+}	
+
+
+
+function cartoon_2(data){
+				
+  		var ary = data.query.results.div.ul.li;
+  		var out = "<ul>";
+  		console.log(ary);
+  			for(index in ary){
+  				var href = "http://www.dm456.com/" +ary[index].p.span.a.href;
+  				var count = ary[index].p.span.a.content;
+  				var title = ary[index].a.title +" "+count;
+  					
+  				console.log("["+index+"]title:"+title);
+  				console.log("href:"+href);	
+  					
+  				out += "<li><a href="+href+" target=\"_blank\" ><div><h2>"+title+"</h2></div></a><hr/></li>";
+  			}
+			
+  			out+= "</ul>"
+  			$(".loadimg").hide();
+  			$("article").html(out);
+			
+ }	
