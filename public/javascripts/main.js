@@ -219,44 +219,60 @@ function cartoon_2(data){
  }	
  
  function reminderTab(){
+ 		//alert(localStorage.getItem("data"));
+	//使用HTML5 LocalStorage	
+	if(localStorage.getItem("data") == null){
+		var _data = null;
+	/* 	var yql = "http://query.yahooapis.com/v1/public/yql?q=select * from html where url='http://www.dm456.com/' and xpath='//*[@id='reminderContent']/ul'"
+			type ="&format=json",
+			diagnostics = "&diagnostics=true", 
+			callback ="&callback=?" ; */
+	 
+		$.getJSON("http://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20html%20where%20url=%22http://www.dm456.com/%22%20and%20xpath='//*[@id=%22reminderContent%22]/ul'&format=json&diagnostics=true&callback=?",function(data){
+			
+			_data = data;						
+			reminderTab_Parse(data);
+			console.log("/******************************每周更新******************************/");
+		})
+		.done(function() { 	
+			localStorage.setItem("data",JSON.stringify(_data));
+			console.log( "reminderTab 解析完畢...." ); 
+		})
+		.fail(function() {	console.log( "reminderTab 失敗" ); }); 	
+	}else{
+			//alert("localstorage");
+			var data = JSON.parse(localStorage.getItem("data"));
+			reminderTab_Parse(data);
+	}	
+ }
  
-	var yql = "http://query.yahooapis.com/v1/public/yql?q=select * from html where url='http://www.dm456.com/' and xpath='//*[@id='reminderContent']/ul'"
-		type ="&format=json",
-		diagnostics = "&diagnostics=true", 
-		callback ="&callback=?" ;
+ function reminderTab_Parse(data){
  
-	$.getJSON("http://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20html%20where%20url=%22http://www.dm456.com/%22%20and%20xpath='//*[@id=%22reminderContent%22]/ul'&format=json&diagnostics=true&callback=?",function(data){
-	
-		console.log("/******************************每周更新******************************/");
-		//console.log(data);
-		var out = "";
-		var days_ = [1,2,3,4,5,6,7];
-		var ary = data.query.results.ul;
-		var days = ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
-		
-		for(index in ary){ // 7
-			console.log(days[index]+"\n");
+ 			var out = "";
+			var days_ = [1,2,3,4,5,6,7];
+			var ary = data.query.results.ul;
+			var days = ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
 			
-			var li_length = ary[index].li.length;
-			//console.log("["+index+"]length:"+li_length);
-			var li_ary =  ary[index].li;
-			
-			//out += '<div class="tab-pane" id="'+days[index]+'"><ul>';
-			new Date().getDay() == days_[index] ? out += '<div class="tab-pane active" id="'+days[index]+'"><ul>' : out += '<div class="tab-pane" id="'+days[index]+'"><ul>';
-			
-			new Date().getDay() == days_[index] ? $("#myTab a[href=#"+days[index]+"]").parent().addClass("active") : "";
-			
-			for(count in li_ary){
-				var href = li_ary[count].a.href;
-				var title = li_ary[count].a.content;	
-				console.log(title+" : "+href);
-				out += '<li><a  href="'+href+'">'+title+'</a></li>' ;
-			}
-			out += '</ul></div>';
-			console.log("/********************************/")
-		}		
-		$(".tab-content").html(out);
-	})
-	.done(function() { console.log( "reminderTab 解析完畢...." ); })
-	.fail(function() {	console.log( "reminderTab 失敗" ); }); 
+			for(index in ary){ // 7
+				console.log(days[index]+"\n");
+				
+				var li_length = ary[index].li.length;
+				//console.log("["+index+"]length:"+li_length);
+				var li_ary =  ary[index].li;
+				
+				//out += '<div class="tab-pane" id="'+days[index]+'"><ul>';
+				new Date().getDay() == days_[index] ? out += '<div class="tab-pane active" id="'+days[index]+'"><ul>' : out += '<div class="tab-pane" id="'+days[index]+'"><ul>';
+				
+				new Date().getDay() == days_[index] ? $("#myTab a[href=#"+days[index]+"]").parent().addClass("active") : "";
+				
+				for(count in li_ary){
+					var href = "http://www.dm456.com/" + li_ary[count].a.href;
+					var title = li_ary[count].a.content;	
+					console.log(title+" : "+href);
+					out += '<li><a  href="'+href+'" target="_blank">'+title+'</a></li>' ;
+				}
+				out += '</ul></div>';
+				console.log("/********************************/")
+			}		
+			$(".tab-content").html(out);	
  }
