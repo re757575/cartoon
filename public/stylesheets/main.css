@@ -186,6 +186,7 @@ nav a:hover {
    ==================== */
 
     nav a {
+
         float: left;
         width: 27%;
         margin: 0 1.7%;
@@ -227,6 +228,7 @@ nav a:hover {
                 box-shadow: 0 5px 10px #aaa;
     }
 
+
 /* ============
     WIDE: Menu
    ============ */
@@ -260,7 +262,6 @@ nav a:hover {
 /* ===============
     Maximal Width
    =============== */
-
     .wrapper {
         width: 1026px; /* 1140px - 10% for margins */
         margin: 0 auto;

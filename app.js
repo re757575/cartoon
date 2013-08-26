@@ -42,8 +42,17 @@ app.get('/', function (req, res) {
 
 app.get('/myjsonp', function (req, res) {
 
-  var url ="";
+
+  /* 
+  	select * from html 
+	where url="http://www.dm456.com/"
+	and xpath='//*[@id="reminderContent"]/ul'
+
+	http://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20html%20where%20url=%22http://www.dm456.com/%22%20and%20xpath='//*[@id=%22reminderContent%22]/ul'&format=json&diagnostics=true&callback=cbfunc
   
+  */
+  
+  var url ="";
   if(req.query.num == "1"){
      console.log("num=1,青空");
      url = "http://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20html%20%0Awhere%20url%3D%22http%3A%2F%2Fqingkong.net%2Fanime%2Frenew%2F%22%0Aand%20xpath%3D'%2F%2F*%5B%40class%3D%22summary%22%5D'&format=json&diagnostics=true&callback=get";

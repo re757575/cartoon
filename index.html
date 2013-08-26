@@ -26,6 +26,9 @@
 			article {
 				min-height:370px;
 			}
+			aside .tab-content li a{
+				color: #FFFFFF;
+			}
 			.loadimg{ width:500px; height:500px; display:table-cell; text-align:center; vertical-align:middle;}
 			.loadimg span{ height:100%; display:inline-block;}
 			.loadimg *{ vertical-align:middle;}
@@ -33,6 +36,12 @@
 			.main li a:hover, a:focus {
 				color: #0088cc ;
 			}
+			.nav-tabs > li > a, .nav-pills > li > a {
+				padding-right: 10px;
+				padding-left: 10px;
+				margin-right: 2px;
+				line-height: 14px;
+			}	
 		</style>
     </head>
     <body>
@@ -54,10 +63,38 @@
 
         <div class="main-container">
             <div class="main wrapper clearfix">
-			<div class="loadimg" style="display: none;" ><img  src="images/ajax-loader.gif " /></div>
-                <article>
-                </article>
 			
+                <article>
+					<div class="loadimg" style="display: none;" ><img  src="images/ajax-loader.gif " /></div>
+                </article>
+	
+				<aside>
+                    <h5>每周</h5>
+						<ul class="nav nav-tabs" id="myTab">
+						  <li ><a href="#Mon">一</a></li>
+						  <li><a href="#Tue">二</a></li>
+						  <li><a href="#Wed">三</a></li>
+						  <li><a href="#Thu">四</a></li>
+						  <li><a href="#Fri">五</a></li>
+						  <li><a href="#Sat">六</a></li>
+						  <li><a href="#Sun">日</a></li>						  
+						</ul>
+
+						<div class="tab-content">
+						  <div class="tab-pane active" id="Mon">
+						<!-- 	<ul style="display: block;">
+<li><a href="/donghua/4943/">虫奉行</a></li><li><a href="/donghua/xintiaoguangzhimeishaonv/">心跳光之美少女</a></li><li><a href="/donghua/mojiewangzi/">魔界王子</a></li><li><a href="/donghua/6550/">探险托里兰托千年真宝</a></li><li><a href="/donghua/5723/">血意少年</a></li><li><a href="/donghua/6521/">有顶天家族</a></li><li><a href="/donghua/bqzdfbqywdej/">八犬传东方八犬异闻第二季</a></li><li><a href="/donghua/6548/">女高网球部第二季</a></li><li><a href="/donghua/5022/">宠物小精灵BW第二季</a></li></ul>	 -->						
+						  </div>
+						  <div class="tab-pane" id="Tue">111</div>
+						  <div class="tab-pane" id="Wed">222</div>
+						  <div class="tab-pane" id="Thu">333</div>
+						  <div class="tab-pane" id="Fri">444</div>
+						  <div class="tab-pane" id="Sat">...</div>
+						  <div class="tab-pane" id="Sun">...</div>						  
+						</div>
+					
+                </aside>
+
             </div> <!-- #main -->
         </div> <!-- #main-container -->
 
@@ -69,7 +106,11 @@
 
         <script src="http://code.jquery.com/jquery-2.0.2.js"></script>
         <script>window.jQuery || document.write('<script src="javascripts/vendor/jquery-2.0.2.js"><\/script>')</script>
-
+		<!--
+		<script src="http://www.bootstrapcdn.com/twitter-bootstrap/2.3.2/js/bootstrap.min.js"></script>
+		-->
+		<script src="javascripts/bootstrap.min.js"></script>
+		
         <script src="javascripts/main.js"></script>
 
     </body>
