@@ -14,8 +14,9 @@ $(function(){
 		});	
 		
 		$('#myTab a').click(function (e) {
-		  e.preventDefault()
-		  $(this).tab('show')
+		  e.preventDefault();
+		  $(this).tab('show');
+		  $(".tab-content").hide().fadeIn(500);	
 		})
 	
 		//console.log(window);	
@@ -175,7 +176,7 @@ function cartoon_1 (data){
 					
 		}
 		out+= "</ul>"                           
-		$("article").html(out);
+		$("article").html(out).hide().fadeIn(1000);
 	
 	}catch (e) {
 		if (e instanceof TypeError ){
@@ -206,7 +207,7 @@ function cartoon_2(data){
   			}
 			
   		out+= "</ul>"
-  		$("article").html(out);		
+  		$("article").html(out).hide().fadeIn(1000);	
 	}
 	catch (e) {
 		if (e instanceof TypeError ){
@@ -274,5 +275,5 @@ function cartoon_2(data){
 				out += '</ul></div>';
 				console.log("/********************************/")
 			}		
-			$(".tab-content").html(out);	
+			$(".tab-content").html(out);
  }
