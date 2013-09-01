@@ -250,9 +250,10 @@ function cartoon_2(data){
  function reminderTab_Parse(data){
  
  			var out = "";
-			var days_ = [1,2,3,4,5,6,7];
+			var days_ = [1,2,3,4,5,6,0];
 			var ary = data.query.results.ul;
 			var days = ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
+			console.log( new Date().getDay() == 0 ? "今天是星期日\n" : "今天是星期"+new Date().getDay()+"\n");
 			
 			for(index in ary){ // 7
 				console.log(days[index]+"\n");
@@ -260,6 +261,7 @@ function cartoon_2(data){
 				var li_length = ary[index].li.length;
 				//console.log("["+index+"]length:"+li_length);
 				var li_ary =  ary[index].li;
+				
 				
 				//out += '<div class="tab-pane" id="'+days[index]+'"><ul>';
 				new Date().getDay() == days_[index] ? out += '<div class="tab-pane active" id="'+days[index]+'"><ul>' : out += '<div class="tab-pane" id="'+days[index]+'"><ul>';
