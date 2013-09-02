@@ -1,27 +1,57 @@
-$(function(){      
+/*requireJS*/
+require.config({
+ //enforceDefine: true,
+	//設定別名
+  paths: {
+    jquery : [
+		"//code.jquery.com/jquery-2.0.2",// cdn
+		//If the CDN location fails, load from this location
+		"vendor/jquery-2.0.2"
+	],
+    "modernizr": "vendor/modernizr-2.6.2-respond-1.1.0.min",
+	"bootstrap": "vendor/bootstrap.min"
+  }
+});
+
+
+
+/* 
+備注:
+	require的順序與callback function的參數順序有關
+	jQuery 預設的 namespace 是 $
+	
+Ex:
+
+require([
+  '../lib/a',
+  'jquery'
+  '../lib/c',
+  '../lib/d',
+], function (moduleA, $, moduleC) {
+  moduleA.doSomething();
+  $.doSomething();
+  moduleC.doSomething();
+  namespaceD.doSomething();
+});
+*/
+
+//載入模組
+require([
+	'jquery',
+	'modernizr',
+	'bootstrap'
+], function ($) {
+	// 主程式
+	$(function(){	
+		ajax_g();
 		reminderTab();
 		one_server_side();
-		$("#one").click(function(){
-			$(this).parent().addClass("active");
-			$("#two").parent().removeClass("active");
-			one_server_side();
-		});
-		
-		$("#two").click(function(){
-			$(this).parent().addClass("active");
-			$("#one").parent().removeClass("active");
-			two_server_side();
-		});	
-		
-		$('#myTab a').click(function (e) {
-		  e.preventDefault();
-		  $(this).tab('show');
-		  $(".tab-content").hide().fadeIn(500);	
-		})
-	
-		//console.log(window);	
+		myClickEvent();
+	});// $ end
+  
 
-});
+}); //require end
+
 	
   /*      
     // 偵錯用    
@@ -41,22 +71,45 @@ $(function(){
     }); 
   */  
   
- var one_errorloadConut = 0; 
- var two_errorloadConut = 0; 
+    //全域變數,YQL分析失敗次數用來判斷切換模式
+    var one_errorloadConut = 0; 
+    var two_errorloadConut = 0; 
+	var speed = 300;
+  	
+	/*ajax 全域設定*/
+    function ajax_g(){
+		$(document).ajaxStart(function() {
+		  console.log("/****************************解析中****************************/");
+		  $("article").html('<div class="loadimg"><img  src="images/ajax-loader.gif " /></div>');
+		})
+		.ajaxError(function( event, jqxhr, settings, exception ) {
+		  console.log("/****************************偵錯****************************/");
+		  //if ( settings.url == "http://127.0.0.1:3000/myjsonp" ) {}
+		  console.log("ajaxError url :\n"+settings.url);
+		});
+    }
   
-	$(document).ajaxStart(function() {
-	  console.log("/****************************解析中****************************/");
-	  $("article").html('<div class="loadimg"><img  src="images/ajax-loader.gif " /></div>');
-	})
-	.ajaxError(function( event, jqxhr, settings, exception ) {
-	  console.log("/****************************偵錯****************************/");
-	  /*if ( settings.url == "http://127.0.0.1:3000/myjsonp" ) {
-		
-	  }*/
-	  
-	   console.log("ajaxError url :\n"+settings.url);
-	});
-
+    function myClickEvent(){
+			//青空
+		$("#one").click(function(){
+			$(this).parent().addClass("active");
+			$("#two").parent().removeClass("active");
+				one_server_side();
+		});
+		//dm456
+		$("#two").click(function(){
+			$(this).parent().addClass("active");
+			$("#one").parent().removeClass("active");
+			two_server_side();
+		});	
+		//一周目錄
+		$('#myTab a').click(function (e) {
+			  e.preventDefault();
+			  $(this).tab('show');
+			  $(".tab-content").hide().fadeIn(speed);	
+		})
+    }
+  
     //抓伺服器讀取的jsonp
 	function one_server_side(){
 		console.log("/**************server side 開始擷取青空動漫****************/\n\n");
@@ -78,30 +131,30 @@ $(function(){
 	}	
 
 	function two_server_side(){
-			console.log("/**************server side 開始擷取dm456****************/\n\n");
+		console.log("/**************server side 開始擷取dm456****************/\n\n");
 			
-			$.getJSON("myjsonp?num=2",cartoon_2)
-			.done(function() { console.log( "解析完畢...." ); })
-			.fail(function() {
-				two_errorloadConut++;
-				console.log( "server 讀取jsonp失敗,轉換client side 抓jsonp" ); 
-				console.log("two_errorloadConut="+two_errorloadConut);
-				if(two_errorloadConut >= 2){
-					$("article").html("<h1 class=\"text-error\">讀取失敗! 請檢查網路連線</h1>");
-					console.log("server client side 皆失敗");
-				}else{		
-					two_client_side();
-				}
-			 }); 
+		$.getJSON("myjsonp?num=2",cartoon_2)
+		.done(function() { console.log( "解析完畢...." ); })
+		.fail(function() {
+			two_errorloadConut++;
+			console.log( "server 讀取jsonp失敗,轉換client side 抓jsonp" ); 
+			console.log("two_errorloadConut="+two_errorloadConut);
+			if(two_errorloadConut >= 2){
+				$("article").html("<h1 class=\"text-error\">讀取失敗! 請檢查網路連線</h1>");
+				console.log("server client side 皆失敗");
+			}else{		
+				two_client_side();
+			}
+		 }); 
 	}
 
 	//client side 直接抓jonp
 	function one_client_side(){
 		console.log("/**************client side開始擷取青空動漫****************/\n\n");
 
-		 $.getJSON("http://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20html%20%0Awhere%20url%3D%22http%3A%2F%2Fqingkong.net%2Fanime%2Frenew%2F%22%0Aand%20xpath%3D'%2F%2F*%5B%40class%3D%22summary%22%5D'&format=json&diagnostics=true&callback=?",cartoon_1)
+		$.getJSON("http://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20html%20%0Awhere%20url%3D%22http%3A%2F%2Fqingkong.net%2Fanime%2Frenew%2F%22%0Aand%20xpath%3D'%2F%2F*%5B%40class%3D%22summary%22%5D'&format=json&diagnostics=true&callback=?",cartoon_1)
 		 .done(function() { console.log( "解析完畢...." ); })
-		 .fail(function() {
+		 fail(function() {
 			one_errorloadConut++;
 			console.log("one_errorloadConut="+one_errorloadConut);
 			if(one_errorloadConut >= 2){
@@ -132,6 +185,7 @@ $(function(){
 		 }); 
 	}	
 
+//青空資料分析
 function cartoon_1 (data){
 				
 	try{
@@ -176,7 +230,7 @@ function cartoon_1 (data){
 					
 		}
 		out+= "</ul>"                           
-		$("article").html(out).hide().fadeIn(1000);
+		$("article").html(out).hide().fadeIn(speed);
 	
 	}catch (e) {
 		if (e instanceof TypeError ){
@@ -189,6 +243,7 @@ function cartoon_1 (data){
 	}		
 }	
 
+//dm456資料分析
 function cartoon_2(data){
 	
 	try{
@@ -207,7 +262,7 @@ function cartoon_2(data){
   			}
 			
   		out+= "</ul>"
-  		$("article").html(out).hide().fadeIn(1000);	
+  		$("article").html(out).hide().fadeIn(speed);	
 	}
 	catch (e) {
 		if (e instanceof TypeError ){
@@ -219,9 +274,11 @@ function cartoon_2(data){
 	}	
  }	
  
+ //dm456一周目錄
  function reminderTab(){
  		//alert(localStorage.getItem("data"));
-	//使用HTML5 LocalStorage	
+		
+	//使用HTML5 LocalStorage,假如沒有	LocalStorage數據,直接重抓YQL
 	if(localStorage.getItem("data") == null){
 		var _data = null;
 	/* 	var yql = "http://query.yahooapis.com/v1/public/yql?q=select * from html where url='http://www.dm456.com/' and xpath='//*[@id='reminderContent']/ul'"
@@ -241,12 +298,14 @@ function cartoon_2(data){
 		})
 		.fail(function() {	console.log( "reminderTab 失敗" ); }); 	
 	}else{
+		//使用LocalStorage數據分析
 			//alert("localstorage");
 			var data = JSON.parse(localStorage.getItem("data"));
 			reminderTab_Parse(data);
 	}	
  }
  
+  //dm456一周目錄分析
  function reminderTab_Parse(data){
  
  			var out = "";
