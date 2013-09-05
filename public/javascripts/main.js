@@ -9,7 +9,8 @@ require.config({
 		"vendor/jquery-2.0.2"
 	],
     "modernizr": "vendor/modernizr-2.6.2-respond-1.1.0.min",
-	"bootstrap": "vendor/bootstrap.min"
+	"bootstrap": "vendor/bootstrap.min",
+	"idangerous.swiper":"vendor/idangerous.swiper"
   }
 });
 
@@ -39,14 +40,16 @@ require([
 require([
 	'jquery',
 	'modernizr',
-	'bootstrap'
+	'bootstrap',
+	'idangerous.swiper'
 ], function ($) {
 	// 主程式
 	$(function(){	
 		ajax_g();
 		reminderTab();
-		one_server_side();
-		myClickEvent();
+		two_server_side("new",true);
+		one_server_side("new",true);
+		myClickEvent(true);
 	});// $ end
   
 
@@ -80,7 +83,7 @@ require([
     function ajax_g(){
 		$(document).ajaxStart(function() {
 		  console.log("/****************************解析中****************************/");
-		  $("article").html('<div class="loadimg"><img  src="images/ajax-loader.gif " /></div>');
+		  //$("article").html('<div class="loadimg"><img  src="images/ajax-loader.gif " /></div>');
 		})
 		.ajaxError(function( event, jqxhr, settings, exception ) {
 		  console.log("/****************************偵錯****************************/");
@@ -89,110 +92,174 @@ require([
 		});
     }
   
-    function myClickEvent(){
+    function myClickEvent(isEn){
 			//青空
-		$("#one").click(function(){
-			$(this).parent().addClass("active");
-			$("#two").parent().removeClass("active");
-				one_server_side();
-		});
-		//dm456
-		$("#two").click(function(){
-			$(this).parent().addClass("active");
-			$("#one").parent().removeClass("active");
-			two_server_side();
-		});	
-		//一周目錄
-		$('#myTab a').click(function (e) {
-			  e.preventDefault();
-			  $(this).tab('show');
-			  $(".tab-content").hide().fadeIn(speed);	
-		})
+			if(isEn == true){
+				$("#one").click(function(){
+					$(this).parent().addClass("active");
+					$("#two").parent().removeClass("active");
+						one_server_side("load",false);
+				});
+				//dm456
+				$("#two").click(function(){
+					$(this).parent().addClass("active");
+					$("#one").parent().removeClass("active");
+						two_server_side("load",false);
+				});	
+				//一周目錄
+				$('#myTab a').click(function (e) {
+					  e.preventDefault();
+					  $(this).tab('show');
+					  $(".tab-content").hide().fadeIn(speed);	
+				})				
+			}else{
+				$("#one").unbind("click");
+				$("#two").unbind("click");
+			}
     }
   
+
     //抓伺服器讀取的jsonp
-	function one_server_side(){
-		console.log("/**************server side 開始擷取青空動漫****************/\n\n");
+	function one_server_side(action,isNew){
+		if(action == "updata" || localStorage.getItem("cartoonOne") == null){
 		
-		$.getJSON("myjsonp?num=1",cartoon_1)
-		 .done(function() { console.log( "解析完畢...." ); })
-		 .fail(function() {
-			one_errorloadConut++;
-			console.log( "server 讀取jsonp失敗,轉換client side 抓jsonp" ); 
-			console.log("one_errorloadConut="+one_errorloadConut);
-			if(one_errorloadConut >= 2){
-				$("article").html("<h1 class=\"text-error\">讀取失敗! 請檢查網路連線</h1>");
-				console.log("server client side 皆失敗");
-			}else{	
-				//轉換成用戶端抓
-				one_client_side();
+			console.log("/**************server side 開始擷取青空動漫****************/\n\n");
+			if(isNew == true){
+				$("article").html('<div class="loadimg"><img  src="images/ajax-loader.gif " /></div>');
 			}
-		 });    
+			$.getJSON("myjsonp?num=1",cartoon_1)
+			 .done(function() { 
+				 console.log( "解析完畢...." ); 
+			 })
+			 .fail(function() {
+				one_errorloadConut++;
+				console.log( "server 讀取jsonp失敗,轉換client side 抓jsonp" ); 
+				console.log("one_errorloadConut="+one_errorloadConut);
+				if(one_errorloadConut >= 2){
+					myClickEvent(false);
+					//$("article").html("<h1 class=\"text-error\">讀取失敗! 請檢查網路連線</h1>");
+					console.log("server client side 皆失敗");
+				}else{	
+					//轉換成用戶端抓
+					one_client_side("updata",true);
+				}
+			 });    		
+		}else{
+		//使用LocalStorage數據分析
+			//alert("localstorage");
+			console.log("/*************開始讀取localstorage的青空動漫的資料****************/\n\n");
+			var data = JSON.parse(localStorage.getItem("cartoonOne"));
+			cartoon_1(data);
+		}	
+	
 	}	
 
-	function two_server_side(){
-		console.log("/**************server side 開始擷取dm456****************/\n\n");
+	function two_server_side(action,isNew){
+		if(action == "updata" || localStorage.getItem("cartoonTwo") == null){
+		
+			console.log("/**************server side 開始擷取dm456****************/\n\n");
 			
-		$.getJSON("myjsonp?num=2",cartoon_2)
-		.done(function() { console.log( "解析完畢...." ); })
-		.fail(function() {
-			two_errorloadConut++;
-			console.log( "server 讀取jsonp失敗,轉換client side 抓jsonp" ); 
-			console.log("two_errorloadConut="+two_errorloadConut);
-			if(two_errorloadConut >= 2){
-				$("article").html("<h1 class=\"text-error\">讀取失敗! 請檢查網路連線</h1>");
-				console.log("server client side 皆失敗");
-			}else{		
-				two_client_side();
+			if(isNew == true){
+				$("article").html('<div class="loadimg"><img  src="images/ajax-loader.gif " /></div>');
 			}
-		 }); 
+							
+			$.getJSON("myjsonp?num=2",cartoon_2)
+			.done(function() { console.log( "解析完畢...." ); })
+			.fail(function() {
+				two_errorloadConut++;
+				console.log( "server 讀取jsonp失敗,轉換client side 抓jsonp" ); 
+				console.log("two_errorloadConut="+two_errorloadConut);
+				if(two_errorloadConut >= 2){
+					myClickEvent(false);
+					//$("article").html("<h1 class=\"text-error\">讀取失敗! 請檢查網路連線</h1>");
+					console.log("server client side 皆失敗");
+				}else{		
+					two_client_side("updata",true);
+				}
+			 }); 			
+		}else{
+		//使用LocalStorage數據分析
+			console.log("/*************開始讀取localstorage的dm456資料****************/\n\n");
+			var data = JSON.parse(localStorage.getItem("cartoonTwo"));
+			cartoon_2(data);
+		}	
+
 	}
 
 	//client side 直接抓jonp
-	function one_client_side(){
-		console.log("/**************client side開始擷取青空動漫****************/\n\n");
+	function one_client_side(action,isNew){
+		if(action == "updata" || localStorage.getItem("cartoonOne") == null){
+			console.log("/**************client side開始擷取青空動漫****************/\n\n");
 
-		$.getJSON("http://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20html%20%0Awhere%20url%3D%22http%3A%2F%2Fqingkong.net%2Fanime%2Frenew%2F%22%0Aand%20xpath%3D'%2F%2F*%5B%40class%3D%22summary%22%5D'&format=json&diagnostics=true&callback=?",cartoon_1)
-		 .done(function() { console.log( "解析完畢...." ); })
-		 fail(function() {
-			one_errorloadConut++;
-			console.log("one_errorloadConut="+one_errorloadConut);
-			if(one_errorloadConut >= 2){
-				$("article").html("<h1 class=\"text-error\">讀取失敗! 請檢查網路連線</h1>");
-				console.log("server client side 皆失敗");
-			}else{
-				console.log( "client side 讀取jsonp失敗,轉換server side 抓jsonp" ); 
-				one_server_side();				
-			}
-		 });    
+			if(isNew == true){
+				$("article").html('<div class="loadimg"><img  src="images/ajax-loader.gif " /></div>');
+			}			
+			
+			$.getJSON("http://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20html%20%0Awhere%20url%3D%22http%3A%2F%2Fqingkong.net%2Fanime%2Frenew%2F%22%0Aand%20xpath%3D'%2F%2F*%5B%40class%3D%22summary%22%5D'&format=json&diagnostics=true&callback=?",cartoon_1)
+			 .done(function() { console.log( "解析完畢...." ); })
+			 .fail(function() {
+				one_errorloadConut++;
+				console.log("one_errorloadConut="+one_errorloadConut);
+				if(one_errorloadConut >= 2){
+					myClickEvent(false);
+					$("article").html("<h1 class=\"text-error\">讀取失敗! 請檢查網路連線</h1>");
+					console.log("server client side 皆失敗");
+				}else{
+					console.log( "client side 讀取jsonp失敗,轉換server side 抓jsonp" ); 
+					one_server_side("updata",true);				
+				}
+			 });  		
+		}else{
+			//使用LocalStorage數據分析
+				var data = JSON.parse(localStorage.getItem("cartoonOne"));
+				cartoon_1(data);
+		}
+  
 	}	
 	
-	function two_client_side(){
-		console.log("/**************client side開始擷取動漫456****************/\n\n");
+	function two_client_side(action,isNew){
+		if(action == "updata" || localStorage.getItem("cartoonTwo") == null){
+		
+			 console.log("/**************client side開始擷取動漫456****************/\n\n");
 
-		 $.getJSON("http://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20html%20%0Awhere%20url%3D%22http%3A%2F%2Fwww.dm456.com%2F%22%0Aand%20xpath%3D'%2F%2F*%5B%40class%3D%22hotUpdateList%22%5D'&format=json&diagnostics=true&callback=?",cartoon_2)
-		 .done(function() { console.log( "解析完畢...." ); })
-		 .fail(function() {
-			one_errorloadConut++;
-			console.log("two_errorloadConut="+two_errorloadConut);
-			if(two_errorloadConut >= 2){
-				$("article").html("<h1 class=\"text-error\">讀取失敗! 請檢查網路連線</h1>");
-				console.log("server client side 皆失敗");
-			}else{
-				console.log( "client side 讀取jsonp失敗,轉換server side 抓jsonp" ); 
-				two_server_side();				
-			}
-		 }); 
+			if(isNew == true){
+				$("article").html('<div class="loadimg"><img  src="images/ajax-loader.gif " /></div>');
+			}			 
+			 
+			 $.getJSON("http://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20html%20%0Awhere%20url%3D%22http%3A%2F%2Fwww.dm456.com%2F%22%0Aand%20xpath%3D'%2F%2F*%5B%40class%3D%22hotUpdateList%22%5D'&format=json&diagnostics=true&callback=?",cartoon_2)
+			 .done(function() { console.log( "解析完畢...." ); })
+			 .fail(function() {
+				one_errorloadConut++;
+				console.log("two_errorloadConut="+two_errorloadConut);
+				if(two_errorloadConut >= 2){
+					myClickEvent(false);
+					$("article").html("<h1 class=\"text-error\">讀取失敗! 請檢查網路連線</h1>");
+					console.log("server client side 皆失敗");
+				}else{
+					console.log( "client side 讀取jsonp失敗,轉換server side 抓jsonp" ); 
+					two_server_side("updata",true);				
+				}
+			 }); 		
+		
+		}else{
+			//使用LocalStorage數據分析
+				var data = JSON.parse(localStorage.getItem("cartoonTwo"));
+				cartoon_2(data);
+		}	
 	}	
+
 
 //青空資料分析
 function cartoon_1 (data){
 				
 	try{
 		console.log(data);
+		
+		localStorage.setItem("cartoonOne",JSON.stringify(data));
+						 
         var ary = data.query.results.div;
-
-		var out = "<ul>";
+		var out = "<div class='swiper-container'><div class='swiper-wrapper'> <div id='preloader'  style='display:none;' class='swiper-slide cartooon-slide'> <div  style='float: left;position: relative;left: 45%;'><img src='images/ajax-loader.gif '></div></div>";
+		
 		for(index in ary){
 			var href = ary[index].div.div.a.href;
 			var title = ary[index].div.div.a.title;
@@ -216,7 +283,7 @@ function cartoon_1 (data){
 				release = "未知";
 				break;						
 			}
-			out += "<li><a href="+href+" target=\"_blank\" ><div><h2>"+title+"</h2><span class=\"text-error\">"+season+"</span>    <span class=\"text-success\">"+release+"</span></div></a><hr/></li>";
+			out += "<div class='swiper-slide cartooon-slide'><a href="+href+" target=\"_blank\" ><div class='slide-hover'><h2>"+title+"</h2><span class=\"text-error\">"+season+"</span>    <span class=\"text-success\">"+release+"</span></div></a></div><hr/>";
 						
 		    console.log("["+index+"]title:"+title);
 	        console.log("href:"+href);		
@@ -229,13 +296,14 @@ function cartoon_1 (data){
 			console.log(ary[index].div.div.span);
 					
 		}
-		out+= "</ul>"                           
+		out+= "</div></div>"                           
 		$("article").html(out).hide().fadeIn(speed);
+		 cartoonOne_Swiper();
 	
 	}catch (e) {
 		if (e instanceof TypeError ){
 			console.log("YQL回傳失敗:"+e.toString());
-			$("article").html("<h1 class=\"text-error\">讀取失敗! 請重試</h1>");
+			//$("article").html("<h1 class=\"text-error\">讀取失敗! 請重試</h1>");
 		//else if (e instanceof )
 		}else{
 			console.log("未知錯誤:"+e.toString());
@@ -248,8 +316,12 @@ function cartoon_2(data){
 	
 	try{
 		var ary = data.query.results.div.ul.li;
-  		var out = "<ul>";
+		localStorage.setItem("cartoonTwo",JSON.stringify(data));
+		
   		console.log(ary);
+		
+		var out = "<div class='swiper-container'><div class='swiper-wrapper'> <div id='preloader'  style='display:none;' class='swiper-slide cartooon-slide'> <div  style='float: left;position: relative;left: 45%;'><img src='images/ajax-loader.gif '></div></div>";
+		
   			for(index in ary){
   				var href = "http://www.dm456.com/" +ary[index].p.span.a.href;
   				var count = ary[index].p.span.a.content;
@@ -263,11 +335,12 @@ function cartoon_2(data){
 			
   		out+= "</ul>"
   		$("article").html(out).hide().fadeIn(speed);	
+		 cartoonTwo_Swiper();
 	}
 	catch (e) {
 		if (e instanceof TypeError ){
 			console.log("YQL回傳失敗:"+e.toString());
-			$("article").html("<h1 class=\"text-error\">讀取失敗! 請重試</h1>");			
+			//$("article").html("<h1 class=\"text-error\">讀取失敗! 請重試</h1>");			
 		}else{
 			console.log("未知錯誤:"+e.toString());
 		}
@@ -279,7 +352,7 @@ function cartoon_2(data){
  		//alert(localStorage.getItem("data"));
 		
 	//使用HTML5 LocalStorage,假如沒有	LocalStorage數據,直接重抓YQL
-	if(localStorage.getItem("data") == null){
+	if(localStorage.getItem("reminder") == null){
 		var _data = null;
 	/* 	var yql = "http://query.yahooapis.com/v1/public/yql?q=select * from html where url='http://www.dm456.com/' and xpath='//*[@id='reminderContent']/ul'"
 			type ="&format=json",
@@ -293,14 +366,14 @@ function cartoon_2(data){
 			console.log("/******************************每周更新******************************/");
 		})
 		.done(function() { 	
-			localStorage.setItem("data",JSON.stringify(_data));
+			localStorage.setItem("reminder",JSON.stringify(_data));
 			console.log( "reminderTab 解析完畢...." ); 
 		})
 		.fail(function() {	console.log( "reminderTab 失敗" ); }); 	
 	}else{
 		//使用LocalStorage數據分析
 			//alert("localstorage");
-			var data = JSON.parse(localStorage.getItem("data"));
+			var data = JSON.parse(localStorage.getItem("reminder"));
 			reminderTab_Parse(data);
 	}	
  }
@@ -337,4 +410,72 @@ function cartoon_2(data){
 				console.log("/********************************/")
 			}		
 			$(".tab-content").html(out);
+ }
+ 
+ function cartoonOne_Swiper(){
+	var holdPosition = 0;
+	var mySwiper = new Swiper('.swiper-container',{
+		slidesPerView:'auto',
+		mode:'vertical',
+		watchActiveIndex: true,
+		onTouchStart: function() {
+			holdPosition = 0;
+		},  
+		onResistanceBefore: function(s, pos){
+			holdPosition = pos;
+		},
+		onTouchEnd: function(){
+			  if (holdPosition>100) {
+				// Hold Swiper in required position
+				mySwiper.setWrapperTranslate(0,100,0)
+
+				//Dissalow futher interactions
+				mySwiper.params.onlyExternal=true
+				$("#preloader").show(function(){
+					one_server_side("updata",false);
+					mySwiper.setWrapperTranslate(0,0,0)
+				});
+			  }
+		}		
+	})	
+	
+	$(".slide-hover").hover(function(){
+		$(this).attr("style","background: rgba(22, 231, 139, 0.54);");
+	},function(){
+		$(this).attr("style","");
+	})
+ }
+ 
+  function cartoonTwo_Swiper(){
+	var holdPosition = 0;
+	var mySwiper = new Swiper('.swiper-container',{
+		slidesPerView:'auto',
+		mode:'vertical',
+		watchActiveIndex: true,
+		onTouchStart: function() {
+			holdPosition = 0;
+		},  
+		onResistanceBefore: function(s, pos){
+			holdPosition = pos;
+		},
+		onTouchEnd: function(){
+			  if (holdPosition>100) {
+				// Hold Swiper in required position
+				mySwiper.setWrapperTranslate(0,100,0)
+
+				//Dissalow futher interactions
+				mySwiper.params.onlyExternal=true
+				$("#preloader").show(function(){
+					two_server_side("updata",false);
+					mySwiper.setWrapperTranslate(0,0,0)
+				});
+			  }
+		}		
+	})	
+	
+	$(".slide-hover").hover(function(){
+		$(this).attr("style","background: rgba(22, 231, 139, 0.54);");
+	},function(){
+		$(this).attr("style","");
+	})
  }
